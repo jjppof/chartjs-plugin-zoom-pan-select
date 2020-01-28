@@ -1,0 +1,8 @@
+{
+  "name": "chartjs-plugin-zoom-pan-select",
+  "version": "0.1.0",
+  "description": "A chartjs plugin for zooming, panning and select data in a chartjs instance.",
+  "main": "ChartJSEnhancements.js",
+  "author": "jjppof",
+  "license": "MIT"
+}
