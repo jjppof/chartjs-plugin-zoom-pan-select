@@ -124,7 +124,7 @@
         });
 
         tools = new ChartJSEnhancements(window.myScatter);
-        tools.initialize({zoom: 1, select: 2, pan: 4});
+        tools.initialize();
         tools.setAfterSelectHandler((selected_points) => {
             if (data_length <= 3000)
                 document.getElementById("selected").innerText = JSON.stringify(selected_points, null, 2);
