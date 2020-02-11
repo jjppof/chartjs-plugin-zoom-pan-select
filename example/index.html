@@ -1,0 +1,164 @@
+
+<!doctype html>
+<html>
+
+<head>
+    <title>Scatter Chart Multi Axis</title>
+    <script src="Chart.bundle.js"></script>
+    <script src="utils.js"></script>
+    <style>
+    canvas {
+		user-select: none;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+    }
+    body {
+        overflow-y: scroll;
+    }
+    </style>
+</head>
+
+<body>
+    <pre>
+        - Click, hold and drag on the plot area to create a select region
+        - Double click on canvas to reset zoom and pan
+        - Use the mouse wheel to zoom
+    </pre>
+    <div style="width:75%">
+        <canvas id="canvas"></canvas>
+    </div>
+    <button id="randomizeData">Randomize data</button>
+    <button id="unselect">Unselect all</button>
+    <button id="resetZoom">Reset zoom/pan</button>
+    <form id="actions">
+        <label><input type="radio" name="actions" value="zoom" checked> Zoom in area</label>
+        <label><input type="radio" name="actions" value="select"> Select bullets</label>
+        <label><input type="radio" name="actions" value="pan"> Pan</label>
+    </form>
+    <pre id="selected"></pre>
+    <script type="module">
+	import ChartJSEnhancements from '../ChartJSEnhancements.js';
+    var color = Chart.helpers.color;
+    var tools = null;
+    const data_length = 1000;
+    var scatterChartData = {
+        datasets: [{
+            label: 'My First dataset',
+            xAxisID: 'x-axis-1',
+            yAxisID: 'y-axis-1',
+            borderColor: window.chartColors.red,
+            backgroundColor: color(window.chartColors.red).alpha(0.2).rgbString(),
+            data: Array(data_length).fill(0).map(i => ({
+                x: randomScalingFactor(),
+                y: randomScalingFactor(),
+            }))
+        }, {
+            label: 'My Second dataset',
+            xAxisID: 'x-axis-1',
+            yAxisID: 'y-axis-2',
+            borderColor: window.chartColors.blue,
+            backgroundColor: color(window.chartColors.blue).alpha(0.2).rgbString(),
+            data: Array(data_length).fill(0).map(i => ({
+                x: randomScalingFactor(),
+                y: randomScalingFactor(),
+            }))
+        }]
+    };
+
+    window.onload = function() {
+        var ctx = document.getElementById('canvas').getContext('2d', { alpha: false });
+        window.myScatter = Chart.Scatter(ctx, {
+            data: scatterChartData,
+            plugins: [{
+                beforeDraw: function(chart, options) {
+                    ctx.fillStyle = "white";
+                    ctx.fillRect(0, 0, document.getElementById('canvas').offsetWidth, document.getElementById('canvas').offsetHeight);
+                }
+            }],
+            options: {
+                responsive: true,
+                intersect: true,
+                tooltips: {
+                    callbacks: {
+                        title: () => {},
+                        label: (tooltipItem, data) => {
+                            return `Custom tooltip: {x: ${tooltipItem.xLabel}, y: ${tooltipItem.yLabel}}`;
+                        }
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Chart.js Scatter Chart - Multi Axis'
+                },
+                scales: {
+                    xAxes: [{
+                        position: 'bottom',
+                        gridLines: {
+                            zeroLineColor: 'rgba(0,0,0,1)'
+                        },
+                        ticks: {
+                            maxRotation: 0,
+                            minRotation: 0
+                        }
+                    }],
+                    yAxes: [{
+                        type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                        display: true,
+                        position: 'left',
+                        id: 'y-axis-1',
+                    }, {
+                        type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                        display: true,
+                        position: 'right',
+                        reverse: true,
+                        id: 'y-axis-2',
+
+                        // grid line settings
+                        gridLines: {
+                            drawOnChartArea: false, // only want the grid lines for one axis to show up
+                        },
+                    }],
+                }
+            }
+        });
+
+        tools = new ChartJSEnhancements(window.myScatter);
+        tools.initialize({zoom: 1, select: 2, pan: 4});
+        tools.setAfterSelectHandler((selected_points) => {
+            if (data_length <= 3000)
+                document.getElementById("selected").innerText = JSON.stringify(selected_points, null, 2);
+            else
+                document.getElementById("selected").innerText = "Too many data to show!";
+        });
+        tools.setAfterUnselectHandler(() => {
+            document.getElementById("selected").innerText = "";
+        })
+    };
+    
+    document.getElementById('actions').addEventListener('change', (event) => {
+        tools.setAction(event.currentTarget.elements["actions"].value);
+    });
+
+    document.getElementById('unselect').addEventListener('click', (event) => {
+		tools.unselectPoints();
+	});
+
+    document.getElementById('randomizeData').addEventListener('click', function() {
+        scatterChartData.datasets.forEach(function(dataset) {
+            dataset.data = dataset.data.map(function() {
+                return {
+                    x: randomScalingFactor(),
+                    y: randomScalingFactor()
+                };
+            });
+        });
+        tools.unselectPoints(false);
+        tools.resetZoom(true, {duration: data_length > 1000 ? 0 : 400});
+    });
+
+    document.getElementById('resetZoom').addEventListener('click', () => { tools.resetZoom(); });
+    </script>
+</body>
+
+</html>
