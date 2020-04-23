@@ -34,5 +34,5 @@ setAfterUnselectHandler(callable);
 setZoomXFactor(factor); //factor is a number
 setZoomYFactor(factor);
 unselectPoints(update); //boolean that says if the chart is going to update or not
-resetZoom(update, update_options) //boolean that says if the chart is going to update or not. update_options is the update options from chartjs update() function
+resetZoom(update, update_options); //boolean that says if the chart is going to update or not. update_options is the update options from chartjs update() function
 ```
