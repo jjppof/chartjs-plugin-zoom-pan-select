@@ -306,7 +306,7 @@ export default class ChartJSEnhancements {
         this.chartjs_object.update({duration: this.quick_mode ? 0 : 50});
     }
     
-    initialize(action_buttons, background_color = 'white) {
+    initialize(action_buttons, background_color = 'white') {
         this.temp_canvas = document.createElement('canvas');
         this.temp_ctx = this.temp_canvas.getContext("2d", { alpha: false });
         this.temp_background_color = background_color;
