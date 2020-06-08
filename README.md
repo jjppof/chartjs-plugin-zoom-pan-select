@@ -3,13 +3,26 @@ A chartjs plugin for **zooming**, **panning** and **selecting** data in a chartj
 
 See the [example](https://jjppof.github.io/chartjs-plugin-zoom-pan-select/example/index).
 
-Install:
+### Install:
 
 ```
 npm install @jjppof/chartjs-plugin-zoom-pan-select
 ```
 
-Usage:
+### Requirements
+
+Due to performance reasons, your canvas need to have opaque background. Suggestion on options:
+
+```javascript
+[{
+    beforeDraw: (chart) => {
+        chart.ctx.fillStyle = "white";
+        chart.ctx.fillRect(0, 0, chart.canvas.offsetWidth, chart.canvas.offsetHeight);
+    }
+}]
+```
+
+### Usage:
 
 ```javascript
 import ChartJSEnhancements from '@jjppof/chartjs-plugin-zoom-pan-select';
@@ -27,7 +40,7 @@ action_buttons = {
 */
 ```
 
-Methods:
+### Methods:
 
 ```javascript
 setAction(action); //sets the mode of the chart if no mouse button is defined. The arg is a string that can be "zoom", "pan" or "select"
