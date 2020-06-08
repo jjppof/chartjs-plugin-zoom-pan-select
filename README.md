@@ -9,19 +9,6 @@ See the [example](https://jjppof.github.io/chartjs-plugin-zoom-pan-select/exampl
 npm install @jjppof/chartjs-plugin-zoom-pan-select
 ```
 
-### Requirements:
-
-Due to performance reasons, your canvas need to have opaque background. Suggestion on options:
-
-```javascript
-[{
-    beforeDraw: (chart) => {
-        chart.ctx.fillStyle = "white";
-        chart.ctx.fillRect(0, 0, chart.canvas.offsetWidth, chart.canvas.offsetHeight);
-    }
-}]
-```
-
 ### Usage:
 
 ```javascript
