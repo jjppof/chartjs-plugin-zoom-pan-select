@@ -30,12 +30,14 @@ import ChartJSEnhancements from '@jjppof/chartjs-plugin-zoom-pan-select';
 let enhancer = new ChartJSEnhancements(chartjs_object);
 enhancer.initialize(mouse_buttons);
 /* 
-// mouse_buttons is a object with the mouse button number for each chart action (pan, zoom or select)
-// see: https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons#Return_value
-action_buttons = {
-    zoom: zoom_button, //optional
-    select: zoom_button, //optional
-    pan: zoom_button //optional
+mouse_buttons is an optional object with the mouse button number for each chart action (pan, zoom or select).
+More info about the numbers: https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons#Return_value
+
+Example:
+mouse_buttons = {
+    zoom: zoom_button_value, //optional
+    select: select_button_value, //optional
+    pan: pan_button_value //optional
 };
 */
 ```
