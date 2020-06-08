@@ -1,3 +1,5 @@
+import * as Chart from 'chart.js';
+
 export default class ChartJSEnhancements {
     constructor(chartjs_object) {
         this.chartjs_object = chartjs_object;
@@ -73,6 +75,10 @@ export default class ChartJSEnhancements {
                     break;
                 default:
                     this.ignore_mouse_button = true;
+                    if (event.shiftKey) {
+                        this.action = "pan";
+                        this.using_shift = true;
+                    }
             }
             this.chartjs_object.unbindEvents();
             this.rect_selector.startX = event.offsetX;
@@ -104,13 +110,19 @@ export default class ChartJSEnhancements {
                         resizeHeight: this.chartjs_object.canvas.offsetHeight,
                         resizeQuality: "high"
                     }).then(image => {
+                        this.temp_ctx.fillStyle = this.temp_background_color;
+                        this.temp_ctx.fillRect(0, 0, this.temp_canvas.width, this.temp_canvas.height);
                         this.temp_ctx.drawImage(image, 0, 0);
                     }).catch(err => {
+                        this.temp_ctx.fillStyle = this.temp_background_color;
+                        this.temp_ctx.fillRect(0, 0, this.temp_canvas.width, this.temp_canvas.height);
                         this.temp_ctx.drawImage(this.chartjs_object.canvas, 0, 0, this.chartjs_object.canvas.width,
                             this.chartjs_object.canvas.height, 0, 0, this.chartjs_object.canvas.offsetWidth,
                             this.chartjs_object.canvas.offsetHeight);
                     });
                 } else {
+                    this.temp_ctx.fillStyle = this.temp_background_color;
+                    this.temp_ctx.fillRect(0, 0, this.temp_canvas.width, this.temp_canvas.height);
                     this.temp_ctx.drawImage(this.chartjs_object.canvas, 0, 0);
                 }
             }
@@ -198,7 +210,10 @@ export default class ChartJSEnhancements {
             this.panning = false;
             this.mouse_button_value = 0;
             this.selecting_points = false;
-            if (!this.ignore_mouse_button) this.action = this.previous_action;
+            if (!this.ignore_mouse_button || this.using_shift) {
+                this.action = this.previous_action;
+                this.using_shift = false;
+            };
         }
     }
 
@@ -207,7 +222,7 @@ export default class ChartJSEnhancements {
         if (!this.panning) {
             this.rect_selector.w = event.offsetX - this.rect_selector.startX;
             this.rect_selector.h = event.offsetY - this.rect_selector.startY;
-            this.ctx.clearRect(0, 0, this.temp_canvas.offsetWidth, this.temp_canvas.offsetHeight);
+            this.ctx.clearRect(0, 0, this.chartjs_object.canvas.offsetWidth, this.chartjs_object.canvas.offsetHeight);
             this.ctx.drawImage(this.temp_canvas, 0, 0);
             const backup = this.ctx.strokeStyle;
             this.ctx.strokeStyle = "#444";
@@ -291,9 +306,10 @@ export default class ChartJSEnhancements {
         this.chartjs_object.update({duration: this.quick_mode ? 0 : 50});
     }
     
-    initialize(action_buttons) {
+    initialize(action_buttons, background_color = 'white) {
         this.temp_canvas = document.createElement('canvas');
         this.temp_ctx = this.temp_canvas.getContext("2d", { alpha: false });
+        this.temp_background_color = background_color;
         this.rect_selector = {};
         this.selector_points = {x: [], y: {}};
         this.resetPoints();
