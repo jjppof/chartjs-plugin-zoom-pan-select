@@ -45,6 +45,7 @@ mouse_buttons = {
 ### Methods:
 
 ```javascript
+initialize(mouse_buttons); // explained on Usage section
 setAction(action); //sets the mode of the chart if no mouse button is defined. The arg is a string that can be "zoom", "pan" or "select"
 setAfterSelectHandler(callable); //callable with select points array as arg
 setAfterUnselectHandler(callable);
