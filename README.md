@@ -9,7 +9,7 @@ See the [example](https://jjppof.github.io/chartjs-plugin-zoom-pan-select/exampl
 npm install @jjppof/chartjs-plugin-zoom-pan-select
 ```
 
-### Requirements
+### Requirements:
 
 Due to performance reasons, your canvas need to have opaque background. Suggestion on options:
 
