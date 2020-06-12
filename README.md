@@ -34,7 +34,7 @@ mouse_buttons = {
 ```javascript
 initialize(mouse_buttons, background_color); // mouse_buttons explained on Usage section. background_color if the background color of your chart. Default: white
 setAction(action); //sets the mode of the chart if no mouse button is defined. The arg is a string that can be "zoom", "pan" or "select"
-setAfterSelectHandler(callable); //callable with select points array as arg
+setAfterSelectHandler(callable); //callable the receives the selected points array as arg
 setAfterUnselectHandler(callable);
 setZoomXFactor(factor); //factor is a number
 setZoomYFactor(factor);
