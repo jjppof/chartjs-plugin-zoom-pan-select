@@ -281,6 +281,10 @@ export default class ChartJSEnhancements {
         this.zoom_y_factor = factor;
     }
 
+    setBackgroundColor(color) {
+        this.temp_background_color = color;
+    }
+
     zoom(event) {
         event.preventDefault();
         if (this.chartjs_object.options.scales.xAxes[0].ticks.min === undefined || this.chartjs_object.options.scales.xAxes[0].ticks.max === undefined) {
