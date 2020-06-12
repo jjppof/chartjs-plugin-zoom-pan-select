@@ -39,6 +39,7 @@ setAfterUnselectHandler(callable);
 setZoomXFactor(factor); //factor is a number
 setZoomYFactor(factor);
 setBackgroundColor(color); //updates the background color of the chart
+setMinMax(); //updates the ticks.max and ticks.min chart properties without updating the chart
 unselectPoints(update); //boolean that says if the chart is going to update or not
 resetZoom(update, update_options); //boolean that says if the chart is going to update or not. update_options is the update options from chartjs update() function
 ```
