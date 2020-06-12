@@ -1,5 +1,5 @@
 # Chart control functions enhancement for ChartJS
-A chartjs plugin for **zooming**, **panning** and **selecting** data in a chartjs instance.
+A [chartjs](https://www.chartjs.org/) plugin for **zooming**, **panning** and **selecting** data in a chartjs instance.
 
 See the [example](https://jjppof.github.io/chartjs-plugin-zoom-pan-select/example/index).
 
