@@ -32,6 +32,7 @@ mouse_buttons = {
 ### Methods:
 
 ```javascript
+ChartJSEnhancements(chartjs_object, change_point_radius); //change_point_radius: default true, when selecting points, if this is set to true, the radius of the bullets changes
 initialize(mouse_buttons, background_color); // mouse_buttons explained on Usage section. background_color if the background color of your chart. Default: white
 setAction(action); //sets the mode of the chart if no mouse button is defined. The arg is a string that can be "zoom", "pan" or "select"
 setAfterSelectHandler(callable); //callable that receives the selected points array as arg
@@ -42,4 +43,6 @@ setBackgroundColor(color); //updates the background color of the chart
 setMinMax(); //updates the ticks.max and ticks.min chart properties without updating the chart
 unselectPoints(update); //boolean that says if the chart is going to update or not
 resetZoom(update, update_options); //boolean that says if the chart is going to update or not. update_options is the update options from chartjs update() function
+removeEventListeners(); //removes all event listeners added by this plugin
+destroy(); //remove all external references
 ```

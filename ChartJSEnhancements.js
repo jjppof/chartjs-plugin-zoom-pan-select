@@ -1,8 +1,9 @@
 import * as Chart from 'chart.js';
 
 export default class ChartJSEnhancements {
-    constructor(chartjs_object) {
+    constructor(chartjs_object, change_point_radius = true) {
         this.chartjs_object = chartjs_object;
+        this.canvas = chartjs_object.canvas;
         this.ctx = this.chartjs_object.ctx;
         this.datasets = this.chartjs_object.data.datasets;
         this.data_length = this.datasets.reduce(function(accumulator, dataset) {
@@ -12,9 +13,12 @@ export default class ChartJSEnhancements {
 
         this.chartjs_object.options.hoverMode = this.quick_mode ? null : Chart.defaults.global.hover.mode;
         this.chartjs_object.options.hover.animationDuration = this.quick_mode ? 0 : 200;
-        for (let i = 0; i < this.datasets.length; ++i) {
-            this.datasets[i].pointRadius = Array(this.datasets[i].data.length);
-            this.datasets[i].pointBorderWidth = Array(this.datasets[i].data.length);
+        this.change_point_radius = change_point_radius;
+        if (this.change_point_radius) {
+            for (let i = 0; i < this.datasets.length; ++i) {
+                this.datasets[i].pointRadius = Array(this.datasets[i].data.length);
+                this.datasets[i].pointBorderWidth = Array(this.datasets[i].data.length);
+            }
         }
         this.chartjs_object.update({duration: 0});
     }
@@ -45,10 +49,12 @@ export default class ChartJSEnhancements {
 
     unselectPoints(update = true) {
         this.selected_points = [];
-        this.datasets.forEach(dataset => {
-            dataset.pointRadius = Array(dataset.data.length);
-            dataset.pointBorderWidth = Array(dataset.data.length);
-        });
+        if (this.change_point_radius) {
+            this.datasets.forEach(dataset => {
+                dataset.pointRadius = Array(dataset.data.length);
+                dataset.pointBorderWidth = Array(dataset.data.length);
+            });
+        }
         if (update) this.chartjs_object.update({duration: this.quick_mode ? 0 : 300});
         if (this.after_unselect_handler !== undefined) this.after_unselect_handler();
     }
@@ -140,7 +146,12 @@ export default class ChartJSEnhancements {
         const ratio_y = point_px_y/height;
         for (let i in this.chartjs_object.options.scales.yAxes) {
             const y_axis_id = this.chartjs_object.options.scales.yAxes[i].id;
-            const point_y = this.chartjs_object.scales[y_axis_id].max - (this.chartjs_object.scales[y_axis_id].max - this.chartjs_object.scales[y_axis_id].min)*ratio_y;
+            let point_y;
+            if (this.chartjs_object.options.scales.yAxes[i].ticks.reverse) {
+                point_y = this.chartjs_object.scales[y_axis_id].min - (this.chartjs_object.scales[y_axis_id].min - this.chartjs_object.scales[y_axis_id].max)*ratio_y;
+            } else {
+                point_y = this.chartjs_object.scales[y_axis_id].max - (this.chartjs_object.scales[y_axis_id].max - this.chartjs_object.scales[y_axis_id].min)*ratio_y;
+            }
             this.selector_points.y[y_axis_id].push(point_y);
         }
 
@@ -164,32 +175,40 @@ export default class ChartJSEnhancements {
                     this.chartjs_object.options.scales.xAxes[0].ticks.min = x_min_max_data.min;
                     this.chartjs_object.options.scales.xAxes[0].ticks.max = x_min_max_data.max;
                     for (let i in this.chartjs_object.options.scales.yAxes) {
-                        this.chartjs_object.options.scales.yAxes[i].ticks.max = y_min_max_data[this.chartjs_object.options.scales.yAxes[i].id].max;
-                        this.chartjs_object.options.scales.yAxes[i].ticks.min = y_min_max_data[this.chartjs_object.options.scales.yAxes[i].id].min;
+                        if (this.chartjs_object.options.scales.yAxes[i].ticks.reverse) {
+                            this.chartjs_object.options.scales.yAxes[i].ticks.max = y_min_max_data[this.chartjs_object.options.scales.yAxes[i].id].min;
+                            this.chartjs_object.options.scales.yAxes[i].ticks.min = y_min_max_data[this.chartjs_object.options.scales.yAxes[i].id].max;
+                        } else {
+                            this.chartjs_object.options.scales.yAxes[i].ticks.max = y_min_max_data[this.chartjs_object.options.scales.yAxes[i].id].max;
+                            this.chartjs_object.options.scales.yAxes[i].ticks.min = y_min_max_data[this.chartjs_object.options.scales.yAxes[i].id].min;
+                        }
                     }
                 } else if (this.action === "select") {
                     let filtered = Array(this.data_length);
                     let j = 0;
                     for (let i = 0; i < this.datasets.length; ++i) {
                         let dataset = this.datasets[i];
-                        dataset.data.forEach((datum, index) => {
+                        for (let index = 0; index < this.datasets.length; ++index) {
+                            let datum = this.datasets[index];
                             const is_inside = datum.x <= x_min_max_data.max && datum.x >= x_min_max_data.min &&
                                 datum.y <= y_min_max_data[dataset.yAxisID].max && datum.y >= y_min_max_data[dataset.yAxisID].min;
                             datum.index = index;
                             if (is_inside) {
-                                dataset.pointRadius[index] = 5;
-                                dataset.pointBorderWidth[index] = 2;
+                                if (this.change_point_radius) {
+                                    dataset.pointRadius[index] = 5;
+                                    dataset.pointBorderWidth[index] = 2;
+                                }
                                 filtered[j++] = {
                                     x: datum.x,
                                     y: datum.y,
                                     dataset: dataset.label,
                                     index: datum.index,
                                 }
-                            } else {
+                            } else if (this.change_point_radius) {
                                 dataset.pointRadius[index] = 3;
                                 dataset.pointBorderWidth[index] = 1;
                             }
-                        });
+                        }
                     }
                     filtered = filtered.slice(0, j);
                     this.selected_points = filtered;
@@ -246,7 +265,10 @@ export default class ChartJSEnhancements {
             for (let i in this.chartjs_object.options.scales.yAxes) {
                 const y_axis_id = this.chartjs_object.options.scales.yAxes[i].id;
                 const height_grid = this.chartjs_object.scales[y_axis_id].max - this.chartjs_object.scales[y_axis_id].min;
-                const height_transformed = height_grid*height_ratio;
+                let height_transformed = height_grid*height_ratio;
+                if (this.chartjs_object.options.scales.yAxes[i].ticks.reverse) {
+                    height_transformed = -height_transformed;
+                }
                 this.chartjs_object.options.scales.yAxes[i].ticks.min += height_transformed;
                 this.chartjs_object.options.scales.yAxes[i].ticks.max += height_transformed;
             }
@@ -303,13 +325,33 @@ export default class ChartJSEnhancements {
         const ratio_y = point_px_y/height;
         for (let i in this.chartjs_object.options.scales.yAxes) {
             const width_view = this.chartjs_object.options.scales.yAxes[i].ticks.max - this.chartjs_object.options.scales.yAxes[i].ticks.min;
-            this.chartjs_object.options.scales.yAxes[i].ticks.min += this.zoom_y_factor * factor * (1 - ratio_y) * width_view;
-            this.chartjs_object.options.scales.yAxes[i].ticks.max -= this.zoom_y_factor * factor * ratio_y * width_view;
+            if (this.chartjs_object.options.scales.yAxes[i].ticks.reverse) {
+                this.chartjs_object.options.scales.yAxes[i].ticks.min += this.zoom_y_factor * factor * ratio_y * width_view;
+                this.chartjs_object.options.scales.yAxes[i].ticks.max -= this.zoom_y_factor * factor * (1 - ratio_y) * width_view;
+            } else {
+                this.chartjs_object.options.scales.yAxes[i].ticks.min += this.zoom_y_factor * factor * (1 - ratio_y) * width_view;
+                this.chartjs_object.options.scales.yAxes[i].ticks.max -= this.zoom_y_factor * factor * ratio_y * width_view;
+            }
         }
 
         this.chartjs_object.update({duration: this.quick_mode ? 0 : 50});
     }
-    
+
+    destroy() {
+        this.canvas = null;
+        this.chartjs_object = null;
+        this.ctx = null;
+        this.datasets = null;
+        this.temp_canvas = null;
+        this.temp_ctx = null;
+    }
+
+    removeEventListeners() {
+        for (let event_name in this.event_handlers) {
+            this.canvas.removeEventListener(event_name, this.event_handlers[event_name]);
+        }
+    }
+
     initialize(action_buttons, background_color = 'white') {
         this.temp_canvas = document.createElement('canvas');
         this.temp_ctx = this.temp_canvas.getContext("2d", { alpha: false });
@@ -341,10 +383,16 @@ export default class ChartJSEnhancements {
             this.action_buttons.pan = action_buttons.pan !== undefined ? action_buttons.pan : 0;
         }
 
-        this.chartjs_object.canvas.addEventListener('mousedown', this.clickHandler.bind(this));
-        this.chartjs_object.canvas.addEventListener('mouseup', this.clickHandler.bind(this));
-        this.chartjs_object.canvas.addEventListener('mousemove', this.mousemoveHandler.bind(this));
-        this.chartjs_object.canvas.addEventListener('dblclick', () => { this.resetZoom() });
-        this.chartjs_object.canvas.addEventListener('wheel', this.zoom.bind(this));
+        this.event_handlers = {
+            'mousedown': this.clickHandler.bind(this),
+            'mouseup': this.clickHandler.bind(this),
+            'mousemove': this.mousemoveHandler.bind(this),
+            'dblclick': () => { this.resetZoom() },
+            'wheel': this.zoom.bind(this)
+        };
+
+        for (let event_name in this.event_handlers) {
+            this.chartjs_object.canvas.addEventListener(event_name, this.event_handlers[event_name]);
+        }
     }
 }

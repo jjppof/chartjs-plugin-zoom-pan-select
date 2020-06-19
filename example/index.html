@@ -25,6 +25,7 @@
         - Click, hold and drag on the plot area to create a select region
         - Double click on canvas to reset zoom and pan
         - Use the mouse wheel to zoom
+        - Hold shift and drag the chart to pan
     </pre>
     <div style="width:75%">
         <canvas id="canvas"></canvas>
@@ -39,7 +40,7 @@
     </form>
     <pre id="selected"></pre>
     <script type="module">
-	import ChartJSEnhancements from '../ChartJSEnhancements.js';
+	import ChartJSEnhancements from '../dist/ChartJSEnhancements.min.js';
     var color = Chart.helpers.color;
     var tools = null;
     const data_length = 1000;
