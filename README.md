@@ -29,6 +29,13 @@ mouse_buttons = {
 */
 ```
 
+### Default behavior
+
+ - Click, hold and drag on the plot area to create a select region;
+ - Double click on canvas to reset zoom and pan;
+ - Use the mouse wheel to zoom;
+ - Hold shift and drag the chart to pan.
+
 ### Methods:
 
 ```javascript
@@ -46,3 +53,7 @@ resetZoom(update, update_options); //boolean that says if the chart is going to 
 removeEventListeners(); //removes all event listeners added by this plugin
 destroy(); //remove all external references
 ```
+
+### Limitations
+
+ - For now, this plugin only works for linear x axis type.

@@ -188,8 +188,8 @@ export default class ChartJSEnhancements {
                     let j = 0;
                     for (let i = 0; i < this.datasets.length; ++i) {
                         let dataset = this.datasets[i];
-                        for (let index = 0; index < this.datasets.length; ++index) {
-                            let datum = this.datasets[index];
+                        for (let index = 0; index < dataset.data.length; ++index) {
+                            let datum = dataset.data[index];
                             const is_inside = datum.x <= x_min_max_data.max && datum.x >= x_min_max_data.min &&
                                 datum.y <= y_min_max_data[dataset.yAxisID].max && datum.y >= y_min_max_data[dataset.yAxisID].min;
                             datum.index = index;
